@@ -298,7 +298,7 @@ def evaluate_loss(model, testing_dataset, loss_func):
     return total_loss / total_samples
 
 
-num_runs = 5
+num_runs = 2
 
 results = {
     'Algorithm': [],
