@@ -140,13 +140,13 @@ def train_pytorch_model_with_rprop(learning_rate, units_layer1, units_layer2, dr
             )
             total_loss += loss
 
-        hybridTrainLoss.append(total_loss / len(train_loader))
+        rpropTrainLoss.append(total_loss / len(train_loader))
 
         model.eval()
         with torch.no_grad():
             output = model(test_X)
             test_loss = criterion(output, torch.argmax(test_Y, dim=1))
-            hybridTestLoss.append(test_loss.item())
+            rpropTestLoss.append(test_loss.item())
 
         print(f"Epoch {epoch + 1}/{EPOCHSAMOUNT}, Train Loss: {hybridTrainLoss[-1]:.4f}, Test Loss: {hybridTestLoss[-1]:.4f}")
     
@@ -361,17 +361,6 @@ plot_losses(adamTrainLoss, adamTestLoss, "Adam Optimizer")
 plot_losses(stochasticGradientDescentTrainLoss, stochasticGradientDescentTestLoss, "SGD Optimizer")
 plot_losses(rpropTrainLoss, rpropTestLoss, "Rprop Optimizer")
 plot_losses(hybridTrainLoss, hybridTestLoss, "Hybrid Optimizer")
-
-grid_search_df = pd.DataFrame(grid_search_results.items(), columns=['Hyperparameters', 'Accuracy'])
-grid_search_df[['Learning Rate', 'Units Layer1', 'Units Layer2', 'Dropout Rate', 'Optimizer']] = pd.DataFrame(grid_search_df['Hyperparameters'].tolist(), index=grid_search_df.index)
-grid_search_df.drop(columns='Hyperparameters', inplace=True)
-heatmap_data = grid_search_df.pivot_table(index='Optimizer', columns='Learning Rate', values='Accuracy')
-plt.figure(figsize=(10, 6))
-sns.heatmap(heatmap_data, annot=True, cmap="RdYlGn", cbar_kws={'label': 'Accuracy'})
-plt.title('Optimizer vs. Learning Rate Heatmap')
-plt.xlabel('Learning Rate')
-plt.ylabel('Optimizer')
-plt.show()
 
 heatmap_data = results_df.pivot_table(index='Algorithm', columns='Learning Rate', values='Test Loss')
 plt.figure(figsize=(10, 6))
